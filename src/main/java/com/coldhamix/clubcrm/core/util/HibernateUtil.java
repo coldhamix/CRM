@@ -30,6 +30,7 @@ public class HibernateUtil {
     }
 
     public static Session getSession() {
+        // todo: change lifetime
         return HibernateUtil.getSessionFactory().openSession();
     }
 
