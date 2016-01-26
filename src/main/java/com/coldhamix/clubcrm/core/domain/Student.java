@@ -1,9 +1,11 @@
 package com.coldhamix.clubcrm.core.domain;
 
-import com.coldhamix.clubcrm.core.dao.StudentManager;
-import com.coldhamix.clubcrm.core.dao.VisitManager;
+import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import java.util.Date;
 import java.util.Set;
 
@@ -17,13 +19,14 @@ import java.util.Set;
 public class Student {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "increment")
+    @GenericGenerator(name = "increment", strategy = "increment")
     private Long id;
     private String name;
     private Date birthday;
 
     // TODO: Workaround because of too short session lifetime. Eager must be changed back to lazy
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany
     private Set<Visit> visits;
 
     public Student() {
@@ -65,8 +68,8 @@ public class Student {
         visits.add(v);
         v.setStudent(this);
 
-        StudentManager.update(this);
-        VisitManager.update(v);
+        // gotta be persisted because session is open StudentManager.update(this);
+        // da same ding VisitManager.update(v);
     }
 
     public void removeVisit(Visit v) {
@@ -74,8 +77,8 @@ public class Student {
             visits.remove(v);
             v.setStudent(null);
 
-            StudentManager.update(this);
-            VisitManager.update(v);
+            //StudentManager.update(this);
+            //VisitManager.update(v);
         }
     }
 }

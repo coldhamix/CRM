@@ -11,43 +11,61 @@ import java.util.List;
  * Author: Vadim A. Khamzin.
  * Created on: 24-01-2016
  */
-public class VisitManager {
-    // TODO: Change session lifetime
+public class VisitManager implements Manager<Visit, Long>, AutoCloseable {
+    private final Session session;
 
-    public static List<Visit> list() {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+    public VisitManager() {
+        session = HibernateUtil.getSessionFactory().openSession();
+    }
+
+    @Override
+    public List<Visit> list() {
         session.beginTransaction();
         List<Visit> result = session.createQuery("from Visit").list();
         session.getTransaction().commit();
         return result;
     }
 
-    public static void save(Visit visit) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+    @Override
+    public void create(Visit visit) {
         session.beginTransaction();
         session.save(visit);
         session.getTransaction().commit();
     }
 
-    public static Visit get(Long id) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+    @Override
+    public Visit findById(Long id) {
         session.beginTransaction();
         Visit visit = (Visit) session.get(Visit.class, id);
         session.getTransaction().commit();
         return visit;
     }
 
-    public static void update(Visit visit) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+    @Override
+    public void update(Visit visit) {
         session.beginTransaction();
         session.update(visit);
         session.getTransaction().commit();
     }
 
-    public static void delete(Visit visit) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+    @Override
+    public void delete(Visit visit) {
         session.beginTransaction();
         session.delete(visit);
         session.getTransaction().commit();
+    }
+
+    @Override
+    public void delete(Long id) {
+        session.beginTransaction();
+        session.delete(
+                session.get(Visit.class, id)
+        );
+        session.getTransaction().commit();
+    }
+
+    @Override
+    public void close() throws Exception {
+        session.close();
     }
 }

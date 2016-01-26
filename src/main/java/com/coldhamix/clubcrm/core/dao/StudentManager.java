@@ -11,43 +11,61 @@ import java.util.List;
  * Author: Vadim A. Khamzin.
  * Created on: 23-01-2016
  */
-public class StudentManager {
-    // TODO: Change session lifetime
+public class StudentManager implements Manager<Student, Long>, AutoCloseable {
+    private final Session session;
 
-    public static List<Student> list() {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+    public StudentManager() {
+        session = HibernateUtil.getSessionFactory().openSession();
+    }
+
+    @Override
+    public List<Student> list() {
         session.beginTransaction();
         List<Student> result = session.createQuery("from Student").list();
         session.getTransaction().commit();
         return result;
     }
 
-    public static void save(Student student) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+    @Override
+    public void create(Student student) {
         session.beginTransaction();
         session.save(student);
         session.getTransaction().commit();
     }
 
-    public static Student get(Long id) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+    @Override
+    public Student findById(Long id) {
         session.beginTransaction();
         Student student = (Student) session.get(Student.class, id);
         session.getTransaction().commit();
         return student;
     }
 
-    public static void update(Student student) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+    @Override
+    public void update(Student student) {
         session.beginTransaction();
         session.update(student);
         session.getTransaction().commit();
     }
 
-    public static void delete(Student student) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+    @Override
+    public void delete(Student student) {
         session.beginTransaction();
         session.delete(student);
         session.getTransaction().commit();
+    }
+
+    @Override
+    public void delete(Long id) {
+        session.beginTransaction();
+        session.delete(
+                session.get(Student.class, id)
+        );
+        session.getTransaction().commit();
+    }
+
+    @Override
+    public void close() throws Exception {
+        session.close();
     }
 }

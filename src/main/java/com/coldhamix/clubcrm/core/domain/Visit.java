@@ -1,5 +1,7 @@
 package com.coldhamix.clubcrm.core.domain;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -19,7 +21,8 @@ public class Visit {
     public static final int TYPE_INDIVIDUAL = 2;
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "increment")
+    @GenericGenerator(name = "increment", strategy = "increment")
     private Long id;
     private Date visitDate;
     private int typeOfVisit;
